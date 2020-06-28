@@ -31,14 +31,22 @@ args = vars(ap.parse_args())
 
 # load the image, convert it to grayscale, and blur it slightly
 image = cv2.imread(args["image"])
+cv2.imshow("image", image)
+cv2.waitKey(0)
+
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray = cv2.GaussianBlur(gray, (7, 7), 0)
+gray = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY_INV)[1]
+cv2.imshow("image", gray)
+cv2.waitKey(0)
 
 # perform edge detection, then perform a dilation + erosion to
 # close gaps in between object edges
 edged = cv2.Canny(gray, 50, 100)
 edged = cv2.dilate(edged, None, iterations=1)
 edged = cv2.erode(edged, None, iterations=1)
+cv2.imshow("image", edged)
+cv2.waitKey(0)
 
 # find contours in the edge map
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
@@ -53,7 +61,7 @@ pixelsPerMetric = None
 # loop over the contours individually
 for c in cnts:
 	# if the contour is not sufficiently large, ignore it
-	if cv2.contourArea(c) < 100:
+	if cv2.contourArea(c) < 500:
 		continue
 
 	# compute the rotated bounding box of the contour
